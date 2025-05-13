@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land Feeder - Agricultural Innovation Platform</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-green: #2ecc71;
+            --secondary-green: #27ae60;
+            --dark-green: #1e8449;
+            --light-background: #f4f6f7;
+            --text-color: #2c3e50;
+            --white: #ffffff;
+            --highlight: #f9d342;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-background);
+        }
+
+        /* Modern Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary-green);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin-top: 70px;
+            overflow: hidden;
+            background-color: var(--primary-green);
+            color: var(--white);
+            text-align: center;
+            padding: 20px;
+            background-image: url('images.jpg'); /* Add the image URL here */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-section img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--secondary-green);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-5px);
+            background-color: var(--dark-green);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 5%;
+            background-color: var(--white);
+            text-align: center;
+        }
+
+        .features-section h2 {
+            font-size: 32px;
+            margin-bottom: 50px;
+            color: var(--primary-green);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: var(--light-background);
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+        }
+
+        .testimonial-section {
+            background-color: var(--secondary-green);
+            color: var(--white);
+            padding: 50px 5%;
+            text-align: center;
+        }
+
+        .testimonial-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background-color: var(--white);
+            color: var(--text-color);
+            padding: 30px;
+            border-radius: 10px;
+            flex: 1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 50px 5%;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content h1 {
+                font-size: 36px;
+            }
+
+            .hero-content p {
+                font-size: 16px;
+            }
+
+            .testimonial-grid {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-logo">Land Feeder</div>
+        <div class="nav-links">
+            <a href="#home">home</a>
+            <a href="#features">Features</a>
+            <a href="file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/registration.html">Register</a>
+            <a href="file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/problems.html">General Problems</a>
+            <a href="file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/bot3.html">AI Bot</a>
+	    <a href="file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/login2.html">Login</a>
+
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <!-- Background Image will show via CSS -->
+        <div class="hero-content">
+            <h1>Revolutionizing Agriculture with Smart Technology</h1>
+            <p>Empowering farmers with data-driven insights, advanced monitoring,sustainable solutions and helping farmers to solve their problems from them selves</p>
+            <a href="#features" class="hero-btn">Explore Features</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <h2>Our Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-satellite feature-icon"></i>
+                <h3>Fastest Solution</h3>
+                <p>Provides relevant and effective solutions quickly and efficiently.</p>
+<a href="file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/bot3.html">ai bot</a>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line feature-icon"></i>
+                <h3>Market Intelligence</h3>
+                <p>Comprehensive market insights and predictive pricing analytics to optimize profits.</p>
+<a href="https://enam.gov.in/web/dashboard/trade-data">indian market</a>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-leaf feature-icon"></i>
+                <h3>Sustainable Practices</h3>
+                <p>Eco-friendly farming recommendations to boost productivity while reducing environmental impact.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonial-section">
+        <h2>What Farmers Are Saying</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <p>"Land Feeder helped me increase my crop yield by providing valuable insights into weather patterns and market prices!"</p>
+                <strong>- bhommanna, Corn Farmer</strong>
+            </div>
+            <div class="testimonial-card">
+                <p>"The AI-powered chatbot answered all my questions instantly and saved me time during the harvest season."</p>
+                <strong>- mallesham, Wheat Farmer</strong>
+            </div>
+            <div class="testimonial-card">
+                <p>"The sustainable practices suggestions are a game-changer. I'm now farming in an eco-friendly way that benefits both my crops and the environment."</p>
+                <strong>- ramesh, Organic Farmer</strong>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>By Pranathi Vishwa Venkataraman</p>
+        <marquee><i>hai! dear respected farmer,we the team land feeders are here to connect you to the world</i></marquee>
+	<h3>Your crop is our responsibility</h3>
+	<h5>coz you are our feeders</h5>
+    </footer>
+
+    <script>
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

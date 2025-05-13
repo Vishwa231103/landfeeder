@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #4682b4;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        h1 {
+            margin: 0;
+        }
+        
+        .search-bar {
+            padding: 20px;
+            background-color: #5f9ea0;
+            text-align: center;
+        }
+        
+        input[type="text"] {
+            padding: 10px;
+            width: 60%;
+            border: none;
+            border-radius: 4px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #2e8b57;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .current-weather {
+            background-color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .weather-icon {
+            font-size: 80px;
+            margin-right: 30px;
+        }
+        
+        .weather-info {
+            flex-grow: 1;
+        }
+        
+        .temp {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        
+        .forecast {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .forecast-day {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 13%;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .day-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #4682b4;
+            color: white;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .forecast-day {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+        
+        .error {
+            color: red;
+            text-align: center;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Weather Forecast</h1>
+            <p>Get the latest weather updates for Telangana districts</p>
+        </header>
+	 <li><a href="file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/com.html">BACK TO HOME</a></li>
+
+        
+        <div class="search-bar">
+            <input type="text" placeholder="Enter your location..." id="city-input">
+            <button onclick="searchWeather()">Search</button>
+        </div>
+        
+        <div id="error-message" class="error" style="display: none;"></div>
+        
+        <div class="current-weather" id="current-weather" style="display: none;">
+            <div class="weather-icon" id="weather-icon">☀️</div>
+            <div class="weather-info">
+                <h2 id="location">Hyderabad</h2>
+                <div class="temp" id="temperature">36°C</div>
+                <p id="conditions">Sunny</p>
+                <p id="additional-info">Humidity: 45% | Wind: 5 km/h</p>
+            </div>
+        </div>
+        
+        <h2 id="forecast-heading" style="display: none;">7-Day Forecast</h2>
+        <div class="forecast" id="forecast" style="display: none;"></div>
+        
+        <footer>
+            <p>© 2023 Telangana Weather Forecast | Data provided by Weather Service</p>
+        </footer>
+    </div>
+    
+    <script>
+        // District weather data
+        const districtWeather = {
+            "hyderabad": { temp: 36, condition: "Sunny", icon: "☀️", humidity: "45%", wind: "5 km/h", 
+                forecast: [
+                    { day: "Monday", high: 36, low: 24, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 35, low: 25, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Wednesday", high: 34, low: 25, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Thursday", high: 33, low: 24, condition: "Cloudy", icon: "☁️" },
+                    { day: "Friday", high: 32, low: 23, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Saturday", high: 31, low: 23, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 32, low: 24, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "warangal": { temp: 34, condition: "Partly Cloudy", icon: "⛅", humidity: "55%", wind: "8 km/h", 
+                forecast: [
+                    { day: "Monday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Tuesday", high: 33, low: 23, condition: "Cloudy", icon: "☁️" },
+                    { day: "Wednesday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Thursday", high: 32, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Friday", high: 31, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 30, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 31, low: 22, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "karimnagar": { temp: 33, condition: "Cloudy", icon: "☁️", humidity: "60%", wind: "6 km/h", 
+                forecast: [
+                    { day: "Monday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Tuesday", high: 32, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Wednesday", high: 31, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Thursday", high: 30, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 30, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Saturday", high: 31, low: 21, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Sunday", high: 32, low: 22, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "nizamabad": { temp: 32, condition: "Light Rain", icon: "🌦️", humidity: "65%", wind: "7 km/h", 
+                forecast: [
+                    { day: "Monday", high: 32, low: 21, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Tuesday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Wednesday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Thursday", high: 29, low: 20, condition: "Cloudy", icon: "☁️" },
+                    { day: "Friday", high: 30, low: 20, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Saturday", high: 31, low: 21, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Sunday", high: 32, low: 21, condition: "Sunny", icon: "☀️" }
+                ]
+            },
+            "khammam": { temp: 35, condition: "Sunny", icon: "☀️", humidity: "50%", wind: "6 km/h", 
+                forecast: [
+                    { day: "Monday", high: 35, low: 24, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 34, low: 24, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Wednesday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Thursday", high: 33, low: 23, condition: "Cloudy", icon: "☁️" },
+                    { day: "Friday", high: 32, low: 23, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Saturday", high: 31, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 32, low: 23, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            // Adding more districts of Telangana
+            "medak": { temp: 32, condition: "Partly Cloudy", icon: "⛅", humidity: "58%", wind: "7 km/h", 
+                forecast: [
+                    { day: "Monday", high: 32, low: 21, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Tuesday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Wednesday", high: 31, low: 20, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Thursday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 29, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 30, low: 20, condition: "Cloudy", icon: "☁️" },
+                    { day: "Sunday", high: 31, low: 21, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "adilabad": { temp: 31, condition: "Cloudy", icon: "☁️", humidity: "62%", wind: "6 km/h", 
+                forecast: [
+                    { day: "Monday", high: 31, low: 20, condition: "Cloudy", icon: "☁️" },
+                    { day: "Tuesday", high: 30, low: 20, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Wednesday", high: 29, low: 19, condition: "Rain", icon: "🌧️" },
+                    { day: "Thursday", high: 28, low: 19, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 29, low: 19, condition: "Cloudy", icon: "☁️" },
+                    { day: "Saturday", high: 30, low: 20, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Sunday", high: 31, low: 20, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "rangareddy": { temp: 35, condition: "Sunny", icon: "☀️", humidity: "48%", wind: "7 km/h", 
+                forecast: [
+                    { day: "Monday", high: 35, low: 23, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Wednesday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Thursday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Friday", high: 32, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Saturday", high: 31, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "mahabubnagar": { temp: 36, condition: "Sunny", icon: "☀️", humidity: "44%", wind: "8 km/h", 
+                forecast: [
+                    { day: "Monday", high: 36, low: 24, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 35, low: 24, condition: "Sunny", icon: "☀️" },
+                    { day: "Wednesday", high: 35, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Thursday", high: 34, low: 23, condition: "Cloudy", icon: "☁️" },
+                    { day: "Friday", high: 33, low: 23, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Saturday", high: 32, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 33, low: 23, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "nalgonda": { temp: 34, condition: "Partly Cloudy", icon: "⛅", humidity: "53%", wind: "7 km/h", 
+                forecast: [
+                    { day: "Monday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Tuesday", high: 33, low: 23, condition: "Cloudy", icon: "☁️" },
+                    { day: "Wednesday", high: 33, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Thursday", high: 32, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 31, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Sunday", high: 33, low: 22, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "suryapet": { temp: 35, condition: "Sunny", icon: "☀️", humidity: "49%", wind: "6 km/h", 
+                forecast: [
+                    { day: "Monday", high: 35, low: 23, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Wednesday", high: 34, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Thursday", high: 33, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Friday", high: 32, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "sangareddy": { temp: 34, condition: "Partly Cloudy", icon: "⛅", humidity: "52%", wind: "7 km/h", 
+                forecast: [
+                    { day: "Monday", high: 34, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Tuesday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Wednesday", high: 32, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Thursday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 30, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Sunday", high: 32, low: 22, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "vikarabad": { temp: 33, condition: "Cloudy", icon: "☁️", humidity: "57%", wind: "6 km/h", 
+                forecast: [
+                    { day: "Monday", high: 33, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Tuesday", high: 32, low: 21, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Wednesday", high: 31, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Thursday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 31, low: 20, condition: "Cloudy", icon: "☁️" },
+                    { day: "Saturday", high: 32, low: 21, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Sunday", high: 33, low: 21, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "jagtial": { temp: 33, condition: "Partly Cloudy", icon: "⛅", humidity: "56%", wind: "7 km/h", 
+                forecast: [
+                    { day: "Monday", high: 33, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Tuesday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Wednesday", high: 31, low: 21, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Thursday", high: 30, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 29, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 30, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Sunday", high: 31, low: 21, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "peddapalli": { temp: 34, condition: "Sunny", icon: "☀️", humidity: "51%", wind: "6 km/h", 
+                forecast: [
+                    { day: "Monday", high: 34, low: 22, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 33, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Wednesday", high: 33, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Thursday", high: 32, low: 21, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Friday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "jayashankar bhupalpally": { temp: 32, condition: "Cloudy", icon: "☁️", humidity: "60%", wind: "5 km/h", 
+                forecast: [
+                    { day: "Monday", high: 32, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Tuesday", high: 31, low: 21, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Wednesday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Thursday", high: 29, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 30, low: 20, condition: "Cloudy", icon: "☁️" },
+                    { day: "Saturday", high: 31, low: 20, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Sunday", high: 32, low: 21, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "jogulamba gadwal": { temp: 36, condition: "Sunny", icon: "☀️", humidity: "43%", wind: "9 km/h", 
+                forecast: [
+                    { day: "Monday", high: 36, low: 23, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 35, low: 23, condition: "Sunny", icon: "☀️" },
+                    { day: "Wednesday", high: 35, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Thursday", high: 34, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Friday", high: 33, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Saturday", high: 32, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "nagarkurnool": { temp: 35, condition: "Sunny", icon: "☀️", humidity: "46%", wind: "8 km/h", 
+                forecast: [
+                    { day: "Monday", high: 35, low: 22, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 34, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Wednesday", high: 34, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Thursday", high: 33, low: 21, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Friday", high: 32, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 31, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 32, low: 21, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "wanaparthy": { temp: 35, condition: "Sunny", icon: "☀️", humidity: "47%", wind: "7 km/h", 
+                forecast: [
+                    { day: "Monday", high: 35, low: 22, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 34, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Wednesday", high: 33, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Thursday", high: 32, low: 21, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Friday", high: 31, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "mulugu": { temp: 32, condition: "Cloudy", icon: "☁️", humidity: "61%", wind: "5 km/h", 
+                forecast: [
+                    { day: "Monday", high: 32, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Tuesday", high: 31, low: 20, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Wednesday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Thursday", high: 29, low: 19, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 30, low: 19, condition: "Cloudy", icon: "☁️" },
+                    { day: "Saturday", high: 31, low: 20, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Sunday", high: 32, low: 20, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "bhadradri kothagudem": { temp: 34, condition: "Partly Cloudy", icon: "⛅", humidity: "54%", wind: "6 km/h", 
+                forecast: [
+                    { day: "Monday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Tuesday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Wednesday", high: 32, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Thursday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 30, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Sunday", high: 32, low: 22, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "komaram bheem asifabad": { temp: 32, condition: "Cloudy", icon: "☁️", humidity: "59%", wind: "5 km/h", 
+                forecast: [
+                    { day: "Monday", high: 32, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Tuesday", high: 31, low: 20, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Wednesday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Thursday", high: 29, low: 19, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 30, low: 19, condition: "Cloudy", icon: "☁️" },
+                    { day: "Saturday", high: 31, low: 20, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Sunday", high: 32, low: 20, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "mancherial": { temp: 33, condition: "Partly Cloudy", icon: "⛅", humidity: "57%", wind: "6 km/h", 
+                forecast: [
+                    { day: "Monday", high: 33, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Tuesday", high: 32, low: 21, condition: "Cloudy", icon: "☁️" },
+                    { day: "Wednesday", high: 31, low: 21, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Thursday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Friday", high: 29, low: 20, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 30, low: 20, condition: "Cloudy", icon: "☁️" },
+                    { day: "Sunday", high: 31, low: 21, condition: "Partly Cloudy", icon: "⛅" }
+                ]
+            },
+            "yadadri bhuvanagiri": { temp: 35, condition: "Sunny", icon: "☀️", humidity: "48%", wind: "7 km/h", 
+                forecast: [
+                    { day: "Monday", high: 35, low: 23, condition: "Sunny", icon: "☀️" },
+                    { day: "Tuesday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                    { day: "Wednesday", high: 34, low: 22, condition: "Cloudy", icon: "☁️" },
+                    { day: "Thursday", high: 33, low: 22, condition: "Light Rain", icon: "🌦️" },
+                    { day: "Friday", high: 32, low: 22, condition: "Rain", icon: "🌧️" },
+                    { day: "Saturday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                    { day: "Sunday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" }
+                ]
+            },
+            "hanumakonda": { temp: 34, condition: "Partly Cloudy", icon: "⛅", humidity: "55%", wind: "7 km/h", 
+            forecast: [
+                { day: "Monday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Tuesday", high: 33, low: 23, condition: "Cloudy", icon: "☁️" },
+                { day: "Wednesday", high: 33, low: 22, condition: "Light Rain", icon: "🌦️" },
+                { day: "Thursday", high: 32, low: 22, condition: "Rain", icon: "🌧️" },
+                { day: "Friday", high: 31, low: 22, condition: "Rain", icon: "🌧️" },
+                { day: "Saturday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" },
+                { day: "Sunday", high: 33, low: 23, condition: "Partly Cloudy", icon: "⛅" }
+            ]
+        },
+        "jangoan": { temp: 35, condition: "Sunny", icon: "☀️", humidity: "50%", wind: "6 km/h", 
+            forecast: [
+                { day: "Monday", high: 35, low: 23, condition: "Sunny", icon: "☀️" },
+                { day: "Tuesday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Wednesday", high: 34, low: 22, condition: "Cloudy", icon: "☁️" },
+                { day: "Thursday", high: 33, low: 22, condition: "Light Rain", icon: "🌦️" },
+                { day: "Friday", high: 32, low: 22, condition: "Rain", icon: "🌧️" },
+                { day: "Saturday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Sunday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" }
+            ]
+        },
+        "kamareddy": { temp: 33, condition: "Cloudy", icon: "☁️", humidity: "58%", wind: "5 km/h", 
+            forecast: [
+                { day: "Monday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" },
+                { day: "Tuesday", high: 32, low: 22, condition: "Light Rain", icon: "🌦️" },
+                { day: "Wednesday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Thursday", high: 30, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Friday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" },
+                { day: "Saturday", high: 32, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Sunday", high: 33, low: 22, condition: "Partly Cloudy", icon: "⛅" }
+            ]
+        },
+        "mahabubabad": { temp: 34, condition: "Partly Cloudy", icon: "⛅", humidity: "54%", wind: "6 km/h", 
+            forecast: [
+                { day: "Monday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Tuesday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" },
+                { day: "Wednesday", high: 32, low: 22, condition: "Light Rain", icon: "🌦️" },
+                { day: "Thursday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Friday", high: 30, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Saturday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" },
+                { day: "Sunday", high: 32, low: 22, condition: "Partly Cloudy", icon: "⛅" }
+            ]
+        },
+        "medchal-malkajgiri": { temp: 35, condition: "Sunny", icon: "☀️", humidity: "49%", wind: "7 km/h", 
+            forecast: [
+                { day: "Monday", high: 35, low: 23, condition: "Sunny", icon: "☀️" },
+                { day: "Tuesday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Wednesday", high: 34, low: 22, condition: "Cloudy", icon: "☁️" },
+                { day: "Thursday", high: 33, low: 22, condition: "Light Rain", icon: "🌦️" },
+                { day: "Friday", high: 32, low: 22, condition: "Rain", icon: "🌧️" },
+                { day: "Saturday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Sunday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" }
+            ]
+        },
+        "narayanpet": { temp: 36, condition: "Sunny", icon: "☀️", humidity: "45%", wind: "8 km/h", 
+            forecast: [
+                { day: "Monday", high: 36, low: 23, condition: "Sunny", icon: "☀️" },
+                { day: "Tuesday", high: 35, low: 23, condition: "Sunny", icon: "☀️" },
+                { day: "Wednesday", high: 35, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Thursday", high: 34, low: 22, condition: "Cloudy", icon: "☁️" },
+                { day: "Friday", high: 33, low: 22, condition: "Light Rain", icon: "🌦️" },
+                { day: "Saturday", high: 32, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Sunday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" }
+            ]
+        },
+        "nirmal": { temp: 33, condition: "Partly Cloudy", icon: "⛅", humidity: "56%", wind: "6 km/h", 
+            forecast: [
+                { day: "Monday", high: 33, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Tuesday", high: 32, low: 22, condition: "Cloudy", icon: "☁️" },
+                { day: "Wednesday", high: 31, low: 21, condition: "Light Rain", icon: "🌦️" },
+                { day: "Thursday", high: 30, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Friday", high: 29, low: 20, condition: "Rain", icon: "🌧️" },
+                { day: "Saturday", high: 30, low: 21, condition: "Cloudy", icon: "☁️" },
+                { day: "Sunday", high: 31, low: 21, condition: "Partly Cloudy", icon: "⛅" }
+            ]
+        },
+        "rajanna sircila": { temp: 34, condition: "Sunny", icon: "☀️", humidity: "51%", wind: "6 km/h", 
+            forecast: [
+                { day: "Monday", high: 34, low: 22, condition: "Sunny", icon: "☀️" },
+                { day: "Tuesday", high: 33, low: 22, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Wednesday", high: 33, low: 21, condition: "Cloudy", icon: "☁️" },
+                { day: "Thursday", high: 32, low: 21, condition: "Light Rain", icon: "🌦️" },
+                { day: "Friday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Saturday", high: 30, low: 20, condition: "Rain", icon: "🌧️" },
+                { day: "Sunday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" }
+            ]
+        },
+        "siddipet": { temp: 34, condition: "Partly Cloudy", icon: "⛅", humidity: "53%", wind: "7 km/h", 
+            forecast: [
+                { day: "Monday", high: 34, low: 23, condition: "Partly Cloudy", icon: "⛅" },
+                { day: "Tuesday", high: 33, low: 22, condition: "Cloudy", icon: "☁️" },
+                { day: "Wednesday", high: 32, low: 22, condition: "Light Rain", icon: "🌦️" },
+                { day: "Thursday", high: 31, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Friday", high: 30, low: 21, condition: "Rain", icon: "🌧️" },
+                { day: "Saturday", high: 31, low: 21, condition: "Cloudy", icon: "☁️" },
+                { day: "Sunday", high: 32, low: 22, condition: "Partly Cloudy", icon: "⛅" }
+            ]
+        }
+        };
+
+        function searchWeather() {
+            const cityInput = document.getElementById('city-input').value.toLowerCase();
+            const errorElement = document.getElementById('error-message');
+            const currentWeatherElement = document.getElementById('current-weather');
+            const forecastElement = document.getElementById('forecast');
+            const forecastHeading = document.getElementById('forecast-heading');
+            
+            // Hide elements initially
+            errorElement.style.display = 'none';
+            currentWeatherElement.style.display = 'none';
+            forecastElement.style.display = 'none';
+            forecastHeading.style.display = 'none';
+            
+            // Check if input is empty
+            if (!cityInput) {
+                errorElement.textContent = 'Please enter a district name';
+                errorElement.style.display = 'block';
+                return;
+            }
+            
+            // Find the district (case insensitive and with partial matches)
+            let foundDistrict = null;
+            for (const district in districtWeather) {
+                if (district.includes(cityInput)) {
+                    foundDistrict = district;
+                    break;
+                }
+            }
+            
+            if (!foundDistrict) {
+                errorElement.textContent = 'District not found. Please enter a valid Telangana district name.';
+                errorElement.style.display = 'block';
+                return;
+            }
+            
+            // Display weather for the found district
+            const weatherData = districtWeather[foundDistrict];
+            
+            // Update current weather
+            document.getElementById('location').textContent = foundDistrict.charAt(0).toUpperCase() + foundDistrict.slice(1);
+            document.getElementById('temperature').textContent = weatherData.temp + '°C';
+            document.getElementById('conditions').textContent = weatherData.condition;
+            document.getElementById('weather-icon').textContent = weatherData.icon;
+            document.getElementById('additional-info').textContent = `Humidity: ${weatherData.humidity} | Wind: ${weatherData.wind}`;
+            
+            // Update forecast
+            forecastElement.innerHTML = '';
+            weatherData.forecast.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'forecast-day';
+                dayElement.innerHTML = `
+                    <div class="day-name">${day.day}</div>
+                    <div>${day.icon}</div>
+                    <div>${day.high}° / ${day.low}°</div>
+                    <div style="font-size: 0.9em; margin-top: 5px;">${day.condition}</div>
+                `;
+                forecastElement.appendChild(dayElement);
+            });
+            
+            // Show the elements
+            currentWeatherElement.style.display = 'flex';
+            forecastHeading.style.display = 'block';
+            forecastElement.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

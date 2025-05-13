@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmers Discussion Forum</title>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f4e9;
+            color: #333;
+        }
+        
+        header {
+            background-color: #8B5A2B;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            animation: slideInFromLeft 0.6s ease-out;
+        }
+        
+        .container {
+            width: 85%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        .problem-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .problem-list:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+        
+        .problem-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .problem-item:hover {
+            background: #f5efe6;
+            transform: translateX(5px);
+        }
+        
+        .problem-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #6B4423;
+            margin-bottom: 5px;
+            transition: color 0.3s;
+        }
+        
+        .problem-item:hover .problem-title {
+            color: #8B5A2B;
+        }
+        
+        .problem-meta {
+            font-size: 0.85rem;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .discussion-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .active-discussion {
+            display: block;
+        }
+        
+        .discussion-title {
+            color: #6B4423;
+            border-bottom: 2px solid #D4A76A;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.7s ease-out;
+        }
+        
+        .solution {
+            background: #f9f5ed;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #D4A76A;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .solution:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .solution-meta {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        .back-button {
+            background: #8B5A2B;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #6B4423;
+            transform: translateX(-3px);
+        }
+        
+        .new-problem-form {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            padding: 20px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #6B4423;
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus, textarea:focus {
+            border-color: #D4A76A;
+            box-shadow: 0 0 0 3px rgba(212, 167, 106, 0.2);
+            outline: none;
+        }
+        
+        textarea {
+            min-height: 100px;
+        }
+        
+        .submit-btn {
+            background: #8B5A2B;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: #6B4423;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            background: #8B5A2B;
+            color: white;
+            margin-top: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:focus {
+            border-color: #D4A76A;
+            box-shadow: 0 0 0 3px rgba(212, 167, 106, 0.2);
+            outline: none;
+            transform: translateY(-2px);
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #e8d9c5;
+            color: #6B4423;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .tag:hover {
+            background: #D4A76A;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        h1 {
+            transition: all 0.3s ease;
+        }
+        
+        h1:hover {
+            transform: scale(1.02);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Animation delays for problem items */
+        .problem-item:nth-child(1) { animation-delay: 0.1s; }
+        .problem-item:nth-child(2) { animation-delay: 0.2s; }
+        .problem-item:nth-child(3) { animation-delay: 0.3s; }
+        .problem-item:nth-child(4) { animation-delay: 0.4s; }
+        
+        /* Animation for form elements */
+        .form-group:nth-child(1) { animation-delay: 0.2s; }
+        .form-group:nth-child(2) { animation-delay: 0.3s; }
+        .form-group:nth-child(3) { animation-delay: 0.4s; }
+        .submit-btn { animation-delay: 0.5s; }
+
+        /* Solution form styling */
+        .solution-form {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5efe6;
+            border-radius: 8px;
+        }
+
+        .user-solution {
+            background: #e8d9c5;
+            border-left: 4px solid #8B5A2B;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Farmers Discussion Forum</h1>
+            <p>Share problems, find solutions, and grow together</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="new-problem-form">
+            <h2>Post a New Problem</h2>
+<li><a href = "file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/com.html">community</a>
+            <form id="problemForm">
+                <div class="form-group">
+                    <label for="userName">Your Name</label>
+                    <input type="text" id="userName" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="userLocation">Your Location</label>
+                    <input type="text" id="userLocation" placeholder="Enter your village/district" required>
+                </div>
+                <div class="form-group">
+                    <label for="problemTitle">Problem Title</label>
+                    <input type="text" id="problemTitle" placeholder="e.g. Tomato blight in my field" required>
+                </div>
+                <div class="form-group">
+                    <label for="problemDescription">Detailed Description</label>
+                    <textarea id="problemDescription" placeholder="Describe your problem in detail including symptoms, duration, and any treatments you've tried" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="problemSolution">Your Proposed Solution (if any)</label>
+                    <textarea id="problemSolution" placeholder="If you've tried any solutions or have ideas, share them here"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="problemTags">Tags (comma separated)</label>
+                    <input type="text" id="problemTags" placeholder="e.g. tomato, blight, fungus">
+                </div>
+                <button type="submit" class="submit-btn">Submit Problem</button>
+            </form>
+        </div>
+        
+        <h2>Browse Existing Discussions</h2>
+        <input type="text" class="search-box" placeholder="Search problems...">
+        
+        <div class="problem-list" id="problemList">
+            <!-- Sample problems - in a real app these would come from a database -->
+            <div class="problem-item" data-discussion="discussion1">
+                <div class="problem-title">Tomato plants wilting despite regular watering</div>
+                <div class="problem-meta">
+                    <span>Posted by: Rajesh Kumar • 3 days ago</span>
+                    <span><span class="tag">tomato</span> <span class="tag">wilting</span> <span class="tag">disease</span></span>
+                </div>
+            </div>
+            
+            <div class="problem-item" data-discussion="discussion2">
+                <div class="problem-title">Yellow spots on wheat leaves - identification and treatment</div>
+                <div class="problem-meta">
+                    <span>Posted by: Priya Patel • 1 week ago</span>
+                    <span><span class="tag">wheat</span> <span class="tag">fungus</span> <span class="tag">leaf-spot</span></span>
+                </div>
+            </div>
+            
+            <div class="problem-item" data-discussion="discussion3">
+                <div class="problem-title">Low milk yield in my dairy cows - feeding suggestions?</div>
+                <div class="problem-meta">
+                    <span>Posted by: Amit Singh • 2 weeks ago</span>
+                    <span><span class="tag">dairy</span> <span class="tag">cows</span> <span class="tag">nutrition</span></span>
+                </div>
+            </div>
+            
+            <div class="problem-item" data-discussion="discussion4">
+                <div class="problem-title">Organic pest control for brinjal crops</div>
+                <div class="problem-meta">
+                    <span>Posted by: Sunita Devi • 3 weeks ago</span>
+                    <span><span class="tag">brinjal</span> <span class="tag">organic</span> <span class="tag">pests</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Discussion containers -->
+        <div class="discussion-container" id="discussion1">
+            <button class="back-button">← Back to Problems</button>
+            <h2 class="discussion-title">Tomato plants wilting despite regular watering</h2>
+            <p><strong>Posted by:</strong> Rajesh Kumar • <strong>Location:</strong> Punjab • <strong>Date:</strong> 3 days ago</p>
+            <p><strong>Problem Description:</strong> My tomato plants are wilting even though I water them daily. The leaves are turning yellow from the bottom up, and some plants have completely collapsed. I've tried increasing water but it doesn't help. The soil is well-drained loam.</p>
+            
+            <div class="solution">
+                <p><strong>Solution from Agricultural Officer:</strong> This sounds like Fusarium wilt, a common soil-borne fungal disease in tomatoes. The fungus blocks the vascular system, preventing water uptake despite moist soil.</p>
+                <p><strong>Recommended Solution:</strong> 
+                <ol>
+                    <li>Remove and destroy affected plants immediately</li>
+                    <li>Rotate crops - don't plant tomatoes in same soil for 4-5 years</li>
+                    <li>Plant resistant varieties (look for "F" on seed packets)</li>
+                    <li>Solarize soil before next planting (cover moist soil with clear plastic for 4-6 weeks in hot season)</li>
+                </ol>
+                </p>
+                <div class="solution-meta">Posted by: Dr. Verma (Agricultural Officer) • 2 days ago</div>
+            </div>
+            
+            <div class="solution">
+                <p><strong>Alternative Approach from Experienced Farmer:</strong> I've faced this before and found that adding Trichoderma viride to the soil helps suppress the fungus. Also, make sure you're not over-watering as this makes it worse.</p>
+                <div class="solution-meta">Posted by: Harish Patel • 1 day ago</div>
+            </div>
+
+            <!-- Solution form for this specific discussion -->
+            <div class="solution-form">
+                <h3>Add Your Solution</h3>
+                <form class="solutionForm" data-discussion="discussion1">
+                    <div class="form-group">
+                        <label for="solUserName1">Your Name</label>
+                        <input type="text" id="solUserName1" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="solUserTitle1">Solution Title</label>
+                        <input type="text" id="solUserTitle1" placeholder="e.g. Organic treatment that worked for me">
+                    </div>
+                    <div class="form-group">
+                        <label for="solUserText1">Your Solution</label>
+                        <textarea id="solUserText1" placeholder="Describe your solution in detail" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Post Solution</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="discussion-container" id="discussion2">
+            <button class="back-button">← Back to Problems</button>
+            <h2 class="discussion-title">Yellow spots on wheat leaves - identification and treatment</h2>
+            <p><strong>Posted by:</strong> Priya Patel • <strong>Location:</strong> Madhya Pradesh • <strong>Date:</strong> 1 week ago</p>
+            <p><strong>Problem Description:</strong> Noticing small yellow spots on wheat leaves that gradually turn brown. The spots are oval-shaped and appear mainly on older leaves first. The variety is HD-2967, planted 45 days ago.</p>
+            
+            <div class="solution">
+                <p><strong>Solution from Plant Pathologist:</strong> This appears to be yellow rust (Puccinia striiformis), a common wheat disease in your region.</p>
+                <p><strong>Recommended Solution:</strong> 
+                <ul>
+                    <li>Apply fungicide containing propiconazole or tebuconazole</li>
+                    <li>Spray in early morning when humidity is high</li>
+                    <li>For future plantings, consider resistant varieties like HD-3086</li>
+                    <li>Avoid excessive nitrogen fertilization</li>
+                </ul>
+                </p>
+                <div class="solution-meta">Posted by: Dr. Mehta (KVK Scientist) • 6 days ago</div>
+            </div>
+
+            <!-- Solution form for this specific discussion -->
+            <div class="solution-form">
+                <h3>Add Your Solution</h3>
+                <form class="solutionForm" data-discussion="discussion2">
+                    <div class="form-group">
+                        <label for="solUserName2">Your Name</label>
+                        <input type="text" id="solUserName2" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="solUserTitle2">Solution Title</label>
+                        <input type="text" id="solUserTitle2" placeholder="e.g. Organic treatment that worked for me">
+                    </div>
+                    <div class="form-group">
+                        <label for="solUserText2">Your Solution</label>
+                        <textarea id="solUserText2" placeholder="Describe your solution in detail" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Post Solution</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="discussion-container" id="discussion3">
+            <button class="back-button">← Back to Problems</button>
+            <h2 class="discussion-title">Low milk yield in my dairy cows - feeding suggestions?</h2>
+            <p><strong>Posted by:</strong> Amit Singh • <strong>Location:</strong> Haryana • <strong>Date:</strong> 2 weeks ago</p>
+            <p><strong>Problem Description:</strong> My Sahiwal cows are producing only 8-9 liters per day when they should be giving 12-15 liters. Current feed includes green fodder (maize/bajra), wheat straw, and 2kg dairy meal per day. Water is available ad libitum.</p>
+            
+            <div class="solution">
+                <p><strong>Solution from Veterinary Nutritionist:</strong> The diet appears deficient in protein and energy for high milk production.</p>
+                <p><strong>Recommended Solution:</strong> 
+                <ol>
+                    <li>Include leguminous fodder like berseem or lucerne (at least 1/3 of green fodder)</li>
+                    <li>Add 1kg of oilcake (groundnut or mustard) per day</li>
+                    <li>Ensure mineral mixture is available (50g per day)</li>
+                    <li>Consider adding 200g bypass protein supplement</li>
+                    <li>Divide concentrate into 3 feedings instead of 2</li>
+                </ol>
+                </p>
+                <div class="solution-meta">Posted by: Dr. Yadav • 10 days ago</div>
+            </div>
+            
+            <div class="solution">
+                <p><strong>Additional Tip from Dairy Farmer:</strong> Make sure your cows are getting enough rest and aren't stressed. We saw a 1.5 liter increase per cow just by improving shed comfort - proper bedding, shade, and reducing flies.</p>
+                <div class="solution-meta">Posted by: Ramesh Gupta • 1 week ago</div>
+            </div>
+
+            <!-- Solution form for this specific discussion -->
+            <div class="solution-form">
+                <h3>Add Your Solution</h3>
+                <form class="solutionForm" data-discussion="discussion3">
+                    <div class="form-group">
+                        <label for="solUserName3">Your Name</label>
+                        <input type="text" id="solUserName3" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="solUserTitle3">Solution Title</label>
+                        <input type="text" id="solUserTitle3" placeholder="e.g. Organic treatment that worked for me">
+                    </div>
+                    <div class="form-group">
+                        <label for="solUserText3">Your Solution</label>
+                        <textarea id="solUserText3" placeholder="Describe your solution in detail" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Post Solution</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="discussion-container" id="discussion4">
+            <button class="back-button">← Back to Problems</button>
+            <h2 class="discussion-title">Organic pest control for brinjal crops</h2>
+            <p><strong>Posted by:</strong> Sunita Devi • <strong>Location:</strong> Bihar • <strong>Date:</strong> 3 weeks ago</p>
+            <p><strong>Problem Description:</strong> My brinjal plants are being attacked by shoot and fruit borer. I want organic solutions as I'm converting to organic farming. Currently seeing bore holes in fruits and wilted shoots.</p>
+            
+            <div class="solution">
+                <p><strong>Solution from Organic Farming Expert:</strong> Here's an effective organic management plan:</p>
+                <p><strong>Recommended Solution:</strong> 
+                <ul>
+                    <li>Install pheromone traps @5/acre to monitor and mass trap adults</li>
+                    <li>Release Trichogramma wasps @50,000/acre weekly for 4 weeks</li>
+                    <li>Spray neem oil (5ml/liter) with soap solution weekly</li>
+                    <li>Remove and destroy all infected fruits and shoots</li>
+                    <li>Intercrop with coriander or marigold as repellent</li>
+                </ul>
+                </p>
+                <div class="solution-meta">Posted by: Organic Farming Center • 2 weeks ago</div>
+            </div>
+            
+            <div class="solution">
+                <p><strong>Traditional Method from Elder Farmer:</strong> We've used a spray made from crushed garlic (100g), chili (50g), and neem leaves (200g) soaked in 1 liter water for 24 hours, then diluted to 10 liters. Spray every 10 days. Also, ash dusting on plants helps.</p>
+                <div class="solution-meta">Posted by: Govind Ji • 2 weeks ago</div>
+            </div>
+
+            <!-- Solution form for this specific discussion -->
+            <div class="solution-form">
+                <h3>Add Your Solution</h3>
+                <form class="solutionForm" data-discussion="discussion4">
+                    <div class="form-group">
+                        <label for="solUserName4">Your Name</label>
+                        <input type="text" id="solUserName4" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="solUserTitle4">Solution Title</label>
+                        <input type="text" id="solUserTitle4" placeholder="e.g. Organic treatment that worked for me">
+                    </div>
+                    <div class="form-group">
+                        <label for="solUserText4">Your Solution</label>
+                        <textarea id="solUserText4" placeholder="Describe your solution in detail" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Post Solution</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Farmers Discussion Forum &copy; 2025 | Contact: landfeeder.com</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Store problems and solutions
+        let discussions = {
+            discussion1: {
+                title: "Tomato plants wilting despite regular watering",
+                author: "Rajesh Kumar",
+                location: "Punjab",
+                date: "3 days ago",
+                description: "My tomato plants are wilting even though I water them daily. The leaves are turning yellow from the bottom up, and some plants have completely collapsed. I've tried increasing water but it doesn't help. The soil is well-drained loam.",
+                solutions: [
+                    {
+                        title: "Solution from Agricultural Officer",
+                        text: "This sounds like Fusarium wilt, a common soil-borne fungal disease in tomatoes. The fungus blocks the vascular system, preventing water uptake despite moist soil.\n\nRecommended Solution: \n1. Remove and destroy affected plants immediately\n2. Rotate crops - don't plant tomatoes in same soil for 4-5 years\n3. Plant resistant varieties (look for \"F\" on seed packets)\n4. Solarize soil before next planting (cover moist soil with clear plastic for 4-6 weeks in hot season)",
+                        author: "Dr. Verma (Agricultural Officer)",
+                        date: "2 days ago"
+                    },
+                    {
+                        title: "Alternative Approach from Experienced Farmer",
+                        text: "I've faced this before and found that adding Trichoderma viride to the soil helps suppress the fungus. Also, make sure you're not over-watering as this makes it worse.",
+                        author: "Harish Patel",
+                        date: "1 day ago"
+                    }
+                ],
+                tags: ["tomato", "wilting", "disease"]
+            },
+            discussion2: {
+                title: "Yellow spots on wheat leaves - identification and treatment",
+                author: "Priya Patel",
+                location: "Madhya Pradesh",
+                date: "1 week ago",
+                description: "Noticing small yellow spots on wheat leaves that gradually turn brown. The spots are oval-shaped and appear mainly on older leaves first. The variety is HD-2967, planted 45 days ago.",
+                solutions: [
+                    {
+                        title: "Solution from Plant Pathologist",
+                        text: "This appears to be yellow rust (Puccinia striiformis), a common wheat disease in your region.\n\nRecommended Solution: \n- Apply fungicide containing propiconazole or tebuconazole\n- Spray in early morning when humidity is high\n- For future plantings, consider resistant varieties like HD-3086\n- Avoid excessive nitrogen fertilization",
+                        author: "Dr. Mehta (KVK Scientist)",
+                        date: "6 days ago"
+                    }
+                ],
+                tags: ["wheat", "fungus", "leaf-spot"]
+            },
+            discussion3: {
+                title: "Low milk yield in my dairy cows - feeding suggestions?",
+                author: "Amit Singh",
+                location: "Haryana",
+                date: "2 weeks ago",
+                description: "My Sahiwal cows are producing only 8-9 liters per day when they should be giving 12-15 liters. Current feed includes green fodder (maize/bajra), wheat straw, and 2kg dairy meal per day. Water is available ad libitum.",
+                solutions: [
+                    {
+                        title: "Solution from Veterinary Nutritionist",
+                        text: "The diet appears deficient in protein and energy for high milk production.\n\nRecommended Solution: \n1. Include leguminous fodder like berseem or lucerne (at least 1/3 of green fodder)\n2. Add 1kg of oilcake (groundnut or mustard) per day\n3. Ensure mineral mixture is available (50g per day)\n4. Consider adding 200g bypass protein supplement\n5. Divide concentrate into 3 feedings instead of 2",
+                        author: "Dr. Yadav",
+                        date: "10 days ago"
+                    },
+                    {
+                        title: "Additional Tip from Dairy Farmer",
+                        text: "Make sure your cows are getting enough rest and aren't stressed. We saw a 1.5 liter increase per cow just by improving shed comfort - proper bedding, shade, and reducing flies.",
+                        author: "Ramesh Gupta",
+                        date: "1 week ago"
+                    }
+                ],
+                tags: ["dairy", "cows", "nutrition"]
+            },
+            discussion4: {
+                title: "Organic pest control for brinjal crops",
+                author: "Sunita Devi",
+                location: "Bihar",
+                date: "3 weeks ago",
+                description: "My brinjal plants are being attacked by shoot and fruit borer. I want organic solutions as I'm converting to organic farming. Currently seeing bore holes in fruits and wilted shoots.",
+                solutions: [
+                    {
+                        title: "Solution from Organic Farming Expert",
+                        text: "Here's an effective organic management plan:\n\nRecommended Solution: \n- Install pheromone traps @5/acre to monitor and mass trap adults\n- Release Trichogramma wasps @50,000/acre weekly for 4 weeks\n- Spray neem oil (5ml/liter) with soap solution weekly\n- Remove and destroy all infected fruits and shoots\n- Intercrop with coriander or marigold as repellent",
+                        author: "Organic Farming Center",
+                        date: "2 weeks ago"
+                    },
+                    {
+                        title: "Traditional Method from Elder Farmer",
+                        text: "We've used a spray made from crushed garlic (100g), chili (50g), and neem leaves (200g) soaked in 1 liter water for 24 hours, then diluted to 10 liters. Spray every 10 days. Also, ash dusting on plants helps.",
+                        author: "Govind Ji",
+                        date: "2 weeks ago"
+                    }
+                ],
+                tags: ["brinjal", "organic", "pests"]
+            }
+        };
+
+        // Generate a unique ID for new discussions
+        function generateId() {
+            return 'discussion' + (Object.keys(discussions).length + 1);
+        }
+
+        // Format date as "X days/hours/minutes ago"
+        function formatDate(date) {
+            return "just now"; // Simplified for this example
+        }
+
+        // Show discussion when problem is clicked
+        document.querySelectorAll('.problem-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const discussionId = this.getAttribute('data-discussion');
+                document.getElementById('problemList').style.display = 'none';
+                document.getElementById(discussionId).classList.add('active-discussion');
+                
+                // Add animation to the discussion container
+                document.getElementById(discussionId).style.animation = 'fadeIn 0.6s ease-out';
+            });
+        });
+        
+        // Back button functionality
+        document.querySelectorAll('.back-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.discussion-container').forEach(container => {
+                    container.classList.remove('active-discussion');
+                });
+                document.getElementById('problemList').style.display = 'block';
+                
+                // Add pulse animation when returning to problem list
+                document.getElementById('problemList').style.animation = 'pulse 0.5s ease';
+                setTimeout(() => {
+                    document.getElementById('problemList').style.animation = '';
+                }, 500);
+            });
+        });
+        
+        // Search functionality
+        document.querySelector('.search-box').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('.problem-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    item.style.animation = 'fadeIn 0.4s ease-out';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // Problem form submission
+        document.getElementById('problemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const userName = document.getElementById('userName').value;
+            const userLocation = document.getElementById('userLocation').value;
+            const problemTitle = document.getElementById('problemTitle').value;
+            const problemDescription = document.getElementById('problemDescription').value;
+            const problemSolution = document.getElementById('problemSolution').value;
+            const problemTags = document.getElementById('problemTags').value.split(',').map(tag => tag.trim());
+            
+            // Create new discussion ID
+            const newId = generateId();
+            
+            // Create new discussion object
+            const newDiscussion = {
+                title: problemTitle,
+                author: userName,
+                location: userLocation,
+                date: formatDate(new Date()),
+                description: problemDescription,
+                solutions: problemSolution ? [{
+                    title: "Solution proposed by " + userName,
+                    text: problemSolution,
+                    author: userName,
+                    date: formatDate(new Date())
+                }] : [],
+                tags: problemTags
+            };
+            
+            // Add to discussions object
+            discussions[newId] = newDiscussion;
+            
+            // Create new problem item in the list
+            const problemList = document.getElementById('problemList');
+            const newProblemItem = document.createElement('div');
+            newProblemItem.className = 'problem-item';
+            newProblemItem.setAttribute('data-discussion', newId);
+            newProblemItem.innerHTML = `
+                <div class="problem-title">${problemTitle}</div>
+                <div class="problem-meta">
+                    <span>Posted by: ${userName} • just now</span>
+                    <span>${problemTags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}</span>
+                </div>
+            `;
+            
+            // Add click event to new problem item
+            newProblemItem.addEventListener('click', function() {
+                document.getElementById('problemList').style.display = 'none';
+                
+                // Create new discussion container if it doesn't exist
+                if (!document.getElementById(newId)) {
+                    createDiscussionContainer(newDiscussion, newId);
+                }
+                
+                document.getElementById(newId).classList.add('active-discussion');
+                document.getElementById(newId).style.animation = 'fadeIn 0.6s ease-out';
+            });
+            
+            // Add animation to new item
+            newProblemItem.style.animation = 'fadeIn 0.5s ease-out';
+            
+            // Insert at the top of the list
+            problemList.insertBefore(newProblemItem, problemList.firstChild);
+            
+            // Create the discussion container
+            createDiscussionContainer(newDiscussion, newId);
+            
+            // Show success message
+            showSuccessMessage('Problem submitted successfully!');
+            
+            // Reset form
+            this.reset();
+        });
+        
+        // Solution form submission (for all solution forms)
+        document.querySelectorAll('.solutionForm').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const discussionId = this.getAttribute('data-discussion');
+                const userName = this.querySelector('input[type="text"]').value;
+                const solutionTitle = this.querySelectorAll('input[type="text"]')[1].value;
+                const solutionText = this.querySelector('textarea').value;
+                
+                // Add solution to the discussions object
+                discussions[discussionId].solutions.push({
+                    title: solutionTitle,
+                    text: solutionText,
+                    author: userName,
+                    date: formatDate(new Date())
+                });
+                
+                // Create solution element
+                const solutionDiv = document.createElement('div');
+                solutionDiv.className = 'solution user-solution';
+                solutionDiv.innerHTML = `
+                    <p><strong>${solutionTitle}</strong> ${solutionText}</p>
+                    <div class="solution-meta">Posted by: ${userName} • just now</div>
+                `;
+                
+                // Add animation
+                solutionDiv.style.animation = 'fadeIn 0.6s ease-out';
+                
+                // Insert before the solution form
+                const discussionContainer = document.getElementById(discussionId);
+                const solutionForm = discussionContainer.querySelector('.solution-form');
+                discussionContainer.insertBefore(solutionDiv, solutionForm);
+                
+                // Show success message
+                showSuccessMessage('Solution posted successfully!');
+                
+                // Reset form
+                this.reset();
+            });
+        });
+        
+        // Function to create a new discussion container
+        function createDiscussionContainer(discussion, id) {
+            const container = document.querySelector('.container');
+            const newDiscussion = document.createElement('div');
+            newDiscussion.className = 'discussion-container';
+            newDiscussion.id = id;
+            newDiscussion.innerHTML = `
+                <button class="back-button">← Back to Problems</button>
+                <h2 class="discussion-title">${discussion.title}</h2>
+                <p><strong>Posted by:</strong> ${discussion.author} • <strong>Location:</strong> ${discussion.location} • <strong>Date:</strong> ${discussion.date}</p>
+                <p><strong>Problem Description:</strong> ${discussion.description}</p>
+                
+                ${discussion.solutions.map(solution => `
+                    <div class="solution ${solution.author.includes('(') ? '' : 'user-solution'}">
+                        <p><strong>${solution.title}</strong> ${solution.text.replace(/\n/g, '<br>')}</p>
+                        <div class="solution-meta">Posted by: ${solution.author} • ${solution.date}</div>
+                    </div>
+                `).join('')}
+                
+                <div class="solution-form">
+                    <h3>Add Your Solution</h3>
+                    <form class="solutionForm" data-discussion="${id}">
+                        <div class="form-group">
+                            <label for="solUserName${id}">Your Name</label>
+                            <input type="text" id="solUserName${id}" placeholder="Enter your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="solUserTitle${id}">Solution Title</label>
+                            <input type="text" id="solUserTitle${id}" placeholder="e.g. Organic treatment that worked for me">
+                        </div>
+                        <div class="form-group">
+                            <label for="solUserText${id}">Your Solution</label>
+                            <textarea id="solUserText${id}" placeholder="Describe your solution in detail" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Post Solution</button>
+                    </form>
+                </div>
+            `;
+            
+            // Add to container
+            container.appendChild(newDiscussion);
+            
+            // Add back button functionality
+            newDiscussion.querySelector('.back-button').addEventListener('click', function() {
+                document.querySelectorAll('.discussion-container').forEach(container => {
+                    container.classList.remove('active-discussion');
+                });
+                document.getElementById('problemList').style.display = 'block';
+                document.getElementById('problemList').style.animation = 'pulse 0.5s ease';
+                setTimeout(() => {
+                    document.getElementById('problemList').style.animation = '';
+                }, 500);
+            });
+            
+            // Add solution form submission
+            newDiscussion.querySelector('.solutionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const discussionId = this.getAttribute('data-discussion');
+                const userName = this.querySelector('input[type="text"]').value;
+                const solutionTitle = this.querySelectorAll('input[type="text"]')[1].value;
+                const solutionText = this.querySelector('textarea').value;
+                
+                // Add solution to the discussions object
+                discussions[discussionId].solutions.push({
+                    title: solutionTitle,
+                    text: solutionText,
+                    author: userName,
+                    date: formatDate(new Date())
+                });
+                
+                // Create solution element
+                const solutionDiv = document.createElement('div');
+                solutionDiv.className = 'solution user-solution';
+                solutionDiv.innerHTML = `
+                    <p><strong>${solutionTitle}</strong> ${solutionText.replace(/\n/g, '<br>')}</p>
+                    <div class="solution-meta">Posted by: ${userName} • just now</div>
+                `;
+                
+                // Add animation
+                solutionDiv.style.animation = 'fadeIn 0.6s ease-out';
+                
+                // Insert before the solution form
+                const discussionContainer = document.getElementById(discussionId);
+                const solutionForm = discussionContainer.querySelector('.solution-form');
+                discussionContainer.insertBefore(solutionDiv, solutionForm);
+                
+                // Show success message
+                showSuccessMessage('Solution posted successfully!');
+                
+                // Reset form
+                this.reset();
+            });
+        }
+        
+        // Function to show success messages
+        function showSuccessMessage(message) {
+            const successMsg = document.createElement('div');
+            successMsg.textContent = message;
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 15px;
+                border-radius: 4px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                animation: slideInFromLeft 0.5s ease-out, fadeOut 2s ease-in 2s forwards;
+                z-index: 1000;
+            `;
+            document.body.appendChild(successMsg);
+            
+            // Remove message after animation
+            setTimeout(() => {
+                successMsg.remove();
+            }, 4000);
+        }
+        
+        // Add hover effect to header
+        const header = document.querySelector('header');
+        header.addEventListener('mouseenter', () => {
+            header.style.transform = 'translateY(-2px)';
+            header.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
+        });
+        
+        header.addEventListener('mouseleave', () => {
+            header.style.transform = '';
+            header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        });
+
+        // Add fadeOut animation to CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

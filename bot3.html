@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land Feeder - Farmer's Assistant</title>
+    <style>
+        :root {
+            --primary-color: #2c5f2d;
+            --secondary-color: #e3f2e4;
+            --background-light: #f0f8f0;
+            --background-dark: #1a2e1a;
+            --text-light: #333;
+            --text-dark: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            height: 100vh;
+            position: relative;
+            background: url('C:\Users\vishw\OneDrive\Desktop\land feeder') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .chat-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: rgba(240, 248, 240, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(173, 216, 230, 0.1) 25%,
+                rgba(144, 238, 144, 0.1) 50%,
+                rgba(255, 228, 181, 0.1) 75%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            z-index: 0;
+        }
+
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .message {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            max-width: 80%;
+            position: relative;
+            transform-origin: left;
+            animation: fadeInScale 0.3s ease-out;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-message {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            animation: slideInRight 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        .bot-message {
+            background: var(--secondary-color);
+            color: var(--text-light);
+            animation: fadeInScale 0.4s ease-out;
+        }
+
+        .typing-indicator {
+            display: inline-flex;
+            padding: 1rem;
+            background: var(--secondary-color);
+            border-radius: 1.5rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            margin: 0 3px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: pulse 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .chat-input {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.9);
+            position: relative;
+            z-index: 1;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 2rem;
+            outline: none;
+            animation: borderPulse 2s infinite;
+        }
+
+        .chat-input button {
+            padding: 1rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .chat-input button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 95, 45, 0.3);
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .quick-reply {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .quick-reply:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 95, 45, 0.3);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { border-color: var(--primary-color); }
+            50% { border-color: rgba(44, 95, 45, 0.5); }
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #1a401f;
+            --secondary-color: #2d4d2e;
+            --background-light: #1a2e1a;
+            --background-dark: #0d1a0d;
+            --text-light: #e0e0e0;
+            --text-dark: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Land Feeder - Your Farming Assistant</h1>
+<a href="file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/homepage4.html">BACK TO HOME</a>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages will be added here -->
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" id="user-input" 
+                   placeholder="Type your farming question or speak...">
+            <button onclick="sendMessage()">Send</button>
+            <button onclick="startVoiceInput()" style="border-radius:50%;padding:10px">🎤</button>
+        </div>
+    </div>
+
+    <script>
+        const knowledgeBase = {
+            'greetings': {
+                response: () => {
+                    const greetings = [
+                        "Namaste Kisan Saathi! How can I assist you today?",
+                        "Hello Farmer Friend! Ready to grow some crops?",
+                        "Welcome! Let's make your farming journey successful!"
+                    ];
+                    return greetings[Math.floor(Math.random() * greetings.length)];
+                },
+                resources: ['land issues', 'weather advisory', 'crop rotation']
+            },
+            'land issues': {
+                response: `Land Management Solutions \n\n1. Fragmented Holdings Solution:\n- Cooperative Farming: Pool small lands (1-2ha) for collective cultivation\n- Example: Maharashtra's Farmer Producer Organizations\n- Govt Scheme: PM-KISAN (₹six thousand/yr direct benefit)\n\n2. Soil Health Improvement:\n- Use Soil Health Card recommendations\n- Rotate legumes (peas, beans) to fix nitrogen\n- Private Service: DeHaat app's soil testing (₹199/test)`,
+                resources: ['cooperative farming', 'soil health', 'irrigation']
+            },
+            'irrigation': {
+                response: ` Smart Irrigation Solutions \n\n1. Drip Irrigation:\n- Save 50% water & increase yield by 30%\n- Govt Subsidy: 55% under PMKSY\n\n2. Rainwater Harvesting:\n- Build farm ponds (₹50,000 subsidy)\n- Use 3D mapping from Bhuvan Portal\n\n3. Solar Pumps:\n- 90% subsidy for SC/ST farmers\n- Maintenance-free for 25 years`,
+                resources: ['drip irrigation', 'solar pumps', 'govt schemes']
+            },
+            'crop rotation': {
+                response: `Crop Rotation Guide \n\n1. Rice-Wheat-Moong Cycle:\n- Increases yield by 15-20%\n- Reduces fertilizer use by 30%\n\n2. Cotton-Pigeon Pea System:\n- Natural pest control\n- Improves soil organic matter\n\n3. Digital Tools:\n- CropIn's SmartFarm app for planning\n- ICAR's Crop Calendar`,
+                resources: ['crop planning', 'organic farming', 'soil health']
+            },
+            'govt schemes': {
+                response: `Key Government Schemes \n\n1. PM-KISAN:\n- six thousand/year direct benefit\n- Apply at https://pmkisan.gov.in\n\n2. PM Fasal Bima Yojana:\n- Premium: 1.5-5%\n- Claim via Common Service Centers\n\n3. Kisan Credit Card:\n- 4% interest subsidy\n- ₹3 lakh limit for crops`,
+                resources: ['loan schemes', 'insurance', 'subsidies']
+            },
+            'default': {
+                response: "Ask about:\n- Land management\n- Irrigation solutions\n- Crop rotation\n- Govt schemes\n- Market prices",
+                resources: ['land issues', 'irrigation', 'govt schemes']
+            }
+        };
+
+        function toggleTheme() {
+            const root = document.documentElement;
+            root.setAttribute('data-theme', 
+                root.getAttribute('data-theme') === 'light' ? 'dark' : 'light'
+            );
+        }
+
+        function addMessage(message, isUser = false) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            
+            if(!isUser) showTypingIndicator();
+            
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.innerHTML = message.replace(/\n/g, '<br>');
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            if(!isUser) {
+                const speech = new SpeechSynthesisUtterance(message.replace(/<[^>]+>/g, ''));
+                speech.rate = 0.9;
+                window.speechSynthesis.speak(speech);
+            }
+        }
+
+        function showTypingIndicator() {
+            const messagesDiv = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicators = document.getElementsByClassName('typing-indicator');
+            if(typingIndicators.length > 0) typingIndicators[0].remove();
+        }
+
+        function getResponse(userMessage) {
+            userMessage = userMessage.toLowerCase();
+            if(['hi','hello','namaste','namaskar'].includes(userMessage)) {
+                return knowledgeBase.greetings;
+            }
+
+            const keywords = {
+                'land': 'land issues', 'soil': 'land issues',
+                'water': 'irrigation', 'irrigation': 'irrigation',
+                'crop': 'crop rotation', 'rotation': 'crop rotation',
+                'scheme': 'govt schemes', 'govt': 'govt schemes'
+            };
+
+            let topic = 'default';
+            for (const [key, value] of Object.entries(keywords)) {
+                if(userMessage.includes(key)) {
+                    topic = value;
+                    break;
+                }
+            }
+
+            const response = knowledgeBase[topic].response
+                .replace(/(\d+\.)/g, '<strong>$1</strong>')
+                .replace(/(Solution:)/g, '<em>$1</em>');
+
+            return {
+                text: response,
+                resources: knowledgeBase[topic].resources
+            };
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            input.value = '';
+            
+            await new Promise(resolve => setTimeout(resolve, 800));
+            hideTypingIndicator();
+            
+            const {text, resources} = getResponse(message);
+            addMessage(text);
+            addQuickReplies(resources);
+        }
+
+        function addQuickReplies(topics) {
+            const quickReplies = document.createElement('div');
+            quickReplies.className = 'quick-replies';
+            topics.forEach(topic => {
+                const button = document.createElement('div');
+                button.className = 'quick-reply';
+                button.textContent = topic;
+                button.onclick = () => handleQuickReply(topic);
+                quickReplies.appendChild(button);
+            });
+            document.getElementById('chat-messages').appendChild(quickReplies);
+        }
+
+        function handleQuickReply(topic) {
+            document.getElementById('user-input').value = topic;
+            sendMessage();
+        }
+
+        let recognition;
+        if('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.onresult = e => {
+                document.getElementById('user-input').value = e.results[0][0].transcript;
+                sendMessage();
+            };
+        }
+
+        function startVoiceInput() {
+            if(recognition) recognition.start();
+        }
+
+        window.onload = () => {
+            addMessage("Welcome to Land Feeder! Ask about:\n- Land management\n- Irrigation solutions\n- Crop rotation\n- Govt schemes");
+            addQuickReplies(['land issues', 'irrigation', 'govt schemes']);
+        };
+    </script>
+</body>
+</html>

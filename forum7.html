@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmers Forum</title>
+    <style>
+        /* Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Merriweather:wght@700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e8f5e9; /* Light green background */
+        }
+
+        header {
+            background-color: #2e7d32; /* Dark green header */
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #388e3c; /* Green tabs */
+            padding: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .tabs button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .tabs button:hover {
+            background-color: #2e7d32; /* Darker green on hover */
+        }
+
+        .tabs button.active {
+            background-color: #1b5e20; /* Active tab color */
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        .topic {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .topic:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .topic h3 {
+            margin-top: 0;
+            color: #1b5e20; /* Dark green for headings */
+        }
+
+        .topic p {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .topic .author {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .topic .author span {
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .topic-detail {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-detail h3 {
+            margin-top: 0;
+            color: #1b5e20;
+        }
+
+        .topic-detail .author {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .topic-detail .author span {
+            font-weight: bold;
+        }
+
+        .topic-detail .stats {
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .topic-detail .stats span {
+            margin-right: 15px;
+        }
+
+        .topic-detail .comments {
+            margin-top: 20px;
+        }
+
+        .topic-detail .comments h4 {
+            margin: 0 0 10px;
+            color: #1b5e20;
+        }
+
+        .topic-detail .comment {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .topic-detail .comment .author {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .topic-detail .comment p {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .topic-detail .comment .discussion-link {
+            color: #2e7d32;
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .topic-detail .comment .discussion-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2e7d32; /* Dark green */
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .fab:hover {
+            background-color: #1b5e20; /* Darker green */
+            transform: scale(1.1);
+        }
+
+        /* Create Post Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #1b5e20;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            min-height: 100px;
+        }
+
+        .modal-content button {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        .modal-content button:hover {
+            background-color: #1b5e20;
+        }
+
+        /* Live Session Card */
+        .live-session {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .live-session:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .live-session h3 {
+            margin-top: 0;
+            color: #1b5e20;
+        }
+
+        .live-session .details {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .live-session .time {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .live-session .expert {
+            font-style: italic;
+        }
+
+        .live-session .join-btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .live-session .join-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        /* Countdown Timer */
+        .countdown {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Discussion Page */
+        .discussion-container {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .discussion-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .discussion-title {
+            font-size: 1.5rem;
+            color: #1b5e20;
+        }
+
+        .original-comment {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .message .sender {
+            font-weight: bold;
+            color: #1b5e20;
+            margin-bottom: 5px;
+        }
+
+        .message-input-area {
+            display: flex;
+            margin-top: 15px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .send-button {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+            
+            .tabs button {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Farmers Forum</h1>
+    </header>
+	 <li><a href="file:///C:/Users/vishw/OneDrive/Desktop/land%20feeder/com.html">BACK TO HOME</a></li>
+
+    <div class="tabs">
+        <button onclick="showTopics('newest')" class="active">Newest</button>
+        <button onclick="showTopics('featured')">Featured</button>
+        <button onclick="showTopics('frequent')">Frequent</button>
+        <button onclick="showTopics('recent')">Most Recent</button>
+        <button onclick="showTopics('live')">Live Sessions</button>
+    </div>
+
+    <div class="container">
+        <!-- Newest Topics -->
+        <div id="newest" class="topic-list">
+            <div class="topic" onclick="showTopicDetail('newest1')">
+                <h3>How to control pests organically?</h3>
+                <p>Discussing natural ways to control pests without using chemicals.</p>
+                <div class="author">Posted by <span>Raju</span></div>
+            </div>
+            <div class="topic" onclick="showTopicDetail('newest2')">
+                <h3>Best crops for dry climates</h3>
+                <p>Exploring crops that thrive in arid conditions.</p>
+                <div class="author">Posted by <span>Krishna</span></div>
+            </div>
+        </div>
+
+        <!-- Featured Topics -->
+        <div id="featured" class="topic-list hidden">
+            <div class="topic" onclick="showTopicDetail('featured1')">
+                <h3>Innovative irrigation techniques</h3>
+                <p>Sharing modern methods to save water while irrigating crops.</p>
+                <div class="author">Posted by <span>Ramesh</span></div>
+            </div>
+            <div class="topic" onclick="showTopicDetail('featured2')">
+                <h3>Soil health improvement</h3>
+                <p>Tips and techniques to improve soil fertility naturally.</p>
+                <div class="author">Posted by <span>Rani</span></div>
+            </div>
+        </div>
+
+        <!-- Frequent Topics -->
+        <div id="frequent" class="topic-list hidden">
+            <div class="topic" onclick="showTopicDetail('frequent1')">
+                <h3>Common crop diseases</h3>
+                <p>Identifying and treating common diseases in crops.</p>
+                <div class="author">Posted by <span>Sai</span></div>
+            </div>
+            <div class="topic" onclick="showTopicDetail('frequent2')">
+                <h3>Best fertilizers for organic farming</h3>
+                <p>Discussing organic fertilizers and their benefits.</p>
+                <div class="author">Posted by <span>Shiva</span></div>
+            </div>
+        </div>
+
+        <!-- Most Recent Topics -->
+        <div id="recent" class="topic-list hidden">
+            <div class="topic" onclick="showTopicDetail('recent1')">
+                <h3>Weather impact on crops</h3>
+                <p>How changing weather patterns affect farming.</p>
+                <div class="author">Posted by <span>Pooja</span></div>
+            </div>
+            <div class="topic" onclick="showTopicDetail('recent2')">
+                <h3>New farming tools and equipment</h3>
+                <p>Exploring the latest tools to make farming more efficient.</p>
+                <div class="author">Posted by <span>Ravi</span></div>
+            </div>
+        </div>
+
+        <!-- Live Sessions -->
+        <div id="live" class="topic-list hidden">
+            <div class="live-session">
+                <h3>Organic Pest Control Workshop</h3>
+                <div class="details">
+                    <span class="time">Today, 3:00 PM</span> | 
+                    <span class="expert">with Agricultural Expert: Dr. Sarah Miller</span>
+                </div>
+                <p>Learn natural methods to control pests without harmful chemicals.</p>
+                <div class="countdown" id="countdown1">Starting in 2 hours 15 minutes</div>
+                <button class="join-btn" onclick="joinLiveSession(1)">Join Session</button>
+            </div>
+            
+            <div class="live-session">
+                <h3>Soil Health Masterclass</h3>
+                <div class="details">
+                    <span class="time">Tomorrow, 10:00 AM</span> | 
+                    <span class="expert">with Soil Scientist: Prof. Raj Patel</span>
+                </div>
+                <p>Discover techniques to improve your soil fertility and crop yield.</p>
+                <div class="countdown" id="countdown2">Starting in 1 day 7 hours</div>
+                <button class="join-btn" onclick="joinLiveSession(2)">Join Session</button>
+            </div>
+            
+            <div class="live-session">
+                <h3>Q&A: Modern Irrigation Methods</h3>
+                <div class="details">
+                    <span class="time">Friday, 2:00 PM</span> | 
+                    <span class="expert">with Irrigation Specialist: Harshi</span>
+                </div>
+                <p>Get your questions answered about water-efficient farming techniques.</p>
+                <div class="countdown" id="countdown3">Starting in 3 days 1 hour</div>
+                <button class="join-btn" onclick="joinLiveSession(3)">Join Session</button>
+            </div>
+        </div>
+
+        <!-- Topic Detail Section -->
+        <div id="topic-detail" class="hidden">
+            <div class="topic-detail">
+                <h3 id="detail-title"></h3>
+                <div class="author">Posted by <span id="detail-author"></span></div>
+                <div class="stats">
+                    <span>👍 <span id="detail-likes">0</span> Likes</span>
+                    <span>💬 <span id="detail-comments">0</span> Comments</span>
+                </div>
+                <div class="comments">
+                    <h4>Comments</h4>
+                    <div id="detail-comments-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Discussion Container -->
+        <div id="discussion-container" class="discussion-container hidden">
+            <div class="discussion-header">
+                <button class="back-button" onclick="backToComments()">← Back to Comments</button>
+                <h2 class="discussion-title" id="discussion-topic-title">Discussion</h2>
+            </div>
+            
+            <div class="original-comment" id="original-comment">
+                <!-- Original comment will be displayed here -->
+            </div>
+            
+            <div class="chat-container" id="chat-container">
+                <!-- Chat messages will appear here -->
+            </div>
+            
+            <div class="message-input-area">
+                <input type="text" class="message-input" id="message-input" placeholder="Type your message...">
+                <button class="send-button" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button (FAB) -->
+    <button class="fab" onclick="openModal()">➕</button>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="modal">
+        <div class="modal-content">
+            <h2>Create a New Post</h2>
+            <textarea id="newPostContent" rows="4" placeholder="Share your ideas or ask a question..."></textarea>
+            <div>
+                <button onclick="createPost()">Post</button>
+                <button onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Session Modal -->
+    <div id="liveSessionModal" class="modal hidden">
+        <div class="modal-content" style="width: 600px;">
+            <h2 id="live-session-title">Live Session</h2>
+            <div id="live-session-details"></div>
+            <div id="live-video-container" style="background: #000; height: 300px; display: flex; justify-content: center; align-items: center; color: white; margin: 15px 0;">
+                Live Video Feed Will Appear Here
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <button onclick="startLiveSession()">Start Broadcasting</button>
+                <button onclick="closeLiveModal()">Leave Session</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for topic details
+        const topicDetails = {
+            newest1: {
+                title: "How to control pests organically?",
+                author: "Raju",
+                likes: 12,
+                comments: [
+                    { 
+                        author: "Krishna", 
+                        text: "Neem oil works wonders!", 
+                        id: "c1",
+                        commenterId: "user456"
+                    },
+                    { 
+                        author: "Ramesh", 
+                        text: "I use diatomaceous earth.", 
+                        id: "c2",
+                        commenterId: "user789"
+                    }
+                ]
+            },
+            newest2: {
+                title: "Best crops for dry climates",
+                author: "Krishna",
+                likes: 8,
+                comments: [
+                    { author: "Rani", text: "Sorghum is a great option.", id: "c3" },
+                    { author: "Sai", text: "Millet is also drought-resistant.", id: "c4" }
+                ]
+            },
+            featured1: {
+                title: "Innovative irrigation techniques",
+                author: "Ramesh",
+                likes: 15,
+                comments: [
+                    { author: "Raju", text: "Drip irrigation is very efficient.", id: "c5" },
+                    { author: "Shiva", text: "I use a sprinkler system.", id: "c6" }
+                ]
+            },
+            featured2: {
+                title: "Soil health improvement",
+                author: "Rani",
+                likes: 10,
+                comments: [
+                    { author: "Pooja", text: "Composting is essential.", id: "c7" },
+                    { author: "Ravi", text: "Crop rotation helps a lot.", id: "c8" }
+                ]
+            },
+            frequent1: {
+                title: "Common crop diseases",
+                author: "Sai",
+                likes: 20,
+                comments: [
+                    { author: "Krishna", text: "Fungal infections are common.", id: "c9" },
+                    { author: "Ramesh", text: "Bacterial blight is a major issue.", id: "c10" }
+                ]
+            },
+            frequent2: {
+                title: "Best fertilizers for organic farming",
+                author: "Shiva",
+                likes: 18,
+                comments: [
+                    { author: "Raju", text: "Vermicompost is excellent.", id: "c11" },
+                    { author: "Rani", text: "I use cow dung manure.", id: "c12" }
+                ]
+            },
+            recent1: {
+                title: "Weather impact on crops",
+                author: "Pooja",
+                likes: 14,
+                comments: [
+                    { author: "Krishna", text: "Droughts are becoming more frequent.", id: "c13" },
+                    { author: "Ramesh", text: "Floods are also a big problem.", id: "c14" }
+                ]
+            },
+            recent2: {
+                title: "New farming tools and equipment",
+                author: "Ravi",
+                likes: 22,
+                comments: [
+                    { author: "Raju", text: "Automated seeders are a game-changer.", id: "c15" },
+                    { author: "Rani", text: "I love using drones for crop monitoring.", id: "c16" }
+                ]
+            }
+        };
+
+        // Sample discussion data
+        const discussions = {
+            c1: [
+                { sender: "Krishna", message: "Neem oil works wonders!", isOriginal: true },
+                { sender: "You", message: "How often should I apply it?" },
+                { sender: "Krishna", message: "Once every 2 weeks should be enough." }
+            ],
+            c2: [
+                { sender: "Ramesh", message: "I use diatomaceous earth.", isOriginal: true },
+                { sender: "You", message: "Does it work for all types of pests?" },
+                { sender: "Ramesh", message: "It's most effective against crawling insects." }
+            ]
+        };
+
+        // Current discussion ID
+        let currentDiscussionId = null;
+        let currentTopicId = null;
+
+        // Function to show topics based on the selected tab
+        function showTopics(category) {
+            // Hide all topic lists and discussion container
+            document.querySelectorAll('.topic-list, .discussion-container').forEach(div => {
+                div.classList.add('hidden');
+            });
+
+            // Show the selected topic list
+            document.getElementById(category).classList.remove('hidden');
+
+            // Update active tab
+            document.querySelectorAll('.tabs button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelector(`.tabs button[onclick="showTopics('${category}')"]`).classList.add('active');
+
+            // Hide topic detail section
+            document.getElementById('topic-detail').classList.add('hidden');
+            
+            // Update countdown timers when Live Sessions tab is selected
+            if (category === 'live') {
+                updateAllCountdowns();
+            }
+        }
+
+        // Function to show topic details
+        function showTopicDetail(topicId) {
+            const detail = topicDetails[topicId];
+            if (!detail) return;
+
+            // Update topic detail section
+            document.getElementById('detail-title').textContent = detail.title;
+            document.getElementById('detail-author').textContent = detail.author;
+            document.getElementById('detail-likes').textContent = detail.likes;
+            document.getElementById('detail-comments').textContent = detail.comments.length;
+
+            // Clear previous comments
+            const commentsList = document.getElementById('detail-comments-list');
+            commentsList.innerHTML = '';
+
+            // Add comments
+            detail.comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+                commentDiv.innerHTML = `
+                    <div class="author">${comment.author}</div>
+                    <p>${comment.text}</p>
+                    <a href="#" class="discussion-link" onclick="openDiscussion('${comment.id}', '${topicId}', '${comment.author}', '${comment.text}'); return false;">
+                        Discuss with ${comment.author}
+                    </a>
+                `;
+                commentsList.appendChild(commentDiv);
+            });
+
+            // Show topic detail section
+            document.getElementById('topic-detail').classList.remove('hidden');
+            
+            // Hide discussion container if it's visible
+            document.getElementById('discussion-container').classList.add('hidden');
+        }
+
+        // Function to open discussion
+        function openDiscussion(commentId, topicId, commentAuthor, commentText) {
+            currentDiscussionId = commentId;
+            currentTopicId = topicId;
+            
+            // Hide topic detail section
+            document.getElementById('topic-detail').classList.add('hidden');
+            
+            // Set discussion title
+            document.getElementById('discussion-topic-title').textContent = `Discussion with ${commentAuthor}`;
+            
+            // Display original comment
+            const originalCommentDiv = document.getElementById('original-comment');
+            originalCommentDiv.innerHTML = `
+                <p><strong>Original comment on:</strong> ${topicDetails[topicId].title}</p>
+                <p><strong>${commentAuthor}:</strong> ${commentText}</p>
+            `;
+            
+            // Load discussion messages
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.innerHTML = '';
+            
+            const discussion = discussions[commentId] || [];
+            discussion.forEach(msg => {
+                if (!msg.isOriginal) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message';
+                    messageDiv.innerHTML = `
+                        <div class="sender">${msg.sender}</div>
+                        <p>${msg.message}</p>
+                    `;
+                    chatContainer.appendChild(messageDiv);
+                }
+            });
+            
+            // Show discussion container
+            document.getElementById('discussion-container').classList.remove('hidden');
+            
+            // Scroll to bottom of chat
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Function to send a message
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            // In a real app, this would send to a server
+            if (!discussions[currentDiscussionId]) {
+                discussions[currentDiscussionId] = [];
+            }
+            
+            discussions[currentDiscussionId].push({
+                sender: "You",
+                message: message
+            });
+            
+            // Update chat display
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <div class="sender">You</div>
+                <p>${message}</p>
+            `;
+            chatContainer.appendChild(messageDiv);
+            
+            // Clear input
+            input.value = '';
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Function to go back to comments
+        function backToComments() {
+            document.getElementById('discussion-container').classList.add('hidden');
+            document.getElementById('topic-detail').classList.remove('hidden');
+        }
+
+        // Function to open the create post modal
+        function openModal() {
+            document.getElementById('createPostModal').style.display = 'flex';
+        }
+
+        // Function to close the create post modal
+        function closeModal() {
+            document.getElementById('createPostModal').style.display = 'none';
+        }
+
+        // Function to create a new post
+        function createPost() {
+            const postContent = document.getElementById('newPostContent').value;
+            if (postContent.trim() === "") {
+                alert("Please write something before posting.");
+                return;
+            }
+
+            // Add the new post to the "Newest" section
+            const newestSection = document.getElementById('newest');
+            const newPost = document.createElement('div');
+            newPost.className = 'topic';
+            newPost.setAttribute('onclick', "showTopicDetail('newest3')");
+            newPost.innerHTML = `
+                <h3>New Post</h3>
+                <p>${postContent}</p>
+                <div class="author">Posted by <span>You</span></div>
+            `;
+            newestSection.insertBefore(newPost, newestSection.firstChild);
+
+            // Clear the textarea and close the modal
+            document.getElementById('newPostContent').value = "";
+            closeModal();
+        }
+
+        // Function to join a live session
+        function joinLiveSession(sessionId) {
+            const session = liveSessions.find(s => s.id === sessionId);
+            if (!session) return;
+
+            document.getElementById('live-session-title').textContent = session.title;
+            document.getElementById('live-session-details').innerHTML = `
+                <p><strong>Time:</strong> ${session.time.toLocaleString()}</p>
+                <p><strong>Hosted by:</strong> ${session.expert}</p>
+                <p>${session.description}</p>
+            `;
+            
+            document.getElementById('liveSessionModal').style.display = 'flex';
+        }
+
+        // Function to close the live session modal
+        function closeLiveModal() {
+            document.getElementById('liveSessionModal').style.display = 'none';
+        }
+
+        // Function to start broadcasting (simulated)
+        function startLiveSession() {
+            alert("Live session broadcasting would start here. In a real implementation, this would connect to a video streaming service.");
+        }
+
+        // Function to update countdown timers
+        function updateCountdown(endTime, elementId) {
+            const now = new Date();
+            const diff = endTime - now;
+            
+            if (diff <= 0) {
+                document.getElementById(elementId).textContent = "Live Now!";
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            let text = "Starting in ";
+            if (days > 0) text += `${days} day${days > 1 ? 's' : ''} `;
+            if (hours > 0) text += `${hours} hour${hours > 1 ? 's' : ''} `;
+            text += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+            
+            document.getElementById(elementId).textContent = text;
+        }
+
+        // Function to update all countdown timers
+        function updateAllCountdowns() {
+            liveSessions.forEach(session => {
+                updateCountdown(session.time, `countdown${session.id}`);
+            });
+        }
+
+        // Live sessions data
+        const liveSessions = [
+            {
+                id: 1,
+                title: "Organic Pest Control Workshop",
+                time: new Date(Date.now() + 8100000), // 2 hours 15 minutes from now
+                expert: "Dr. Sarah Miller",
+                description: "Learn natural methods to control pests without harmful chemicals."
+            },
+            {
+                id: 2,
+                title: "Soil Health Masterclass",
+                time: new Date(Date.now() + 111000000), // 1 day 7 hours from now
+                expert: "Prof. Raj Patel",
+                description: "Discover techniques to improve your soil fertility and crop yield."
+            },
+            {
+                id: 3,
+                title: "Q&A: Modern Irrigation Methods",
+                time: new Date(Date.now() + 266400000), // 3 days 1 hour from now
+                expert: "Harshi",
+                description: "Get your questions answered about water-efficient farming techniques."
+            }
+        ];
+
+        // Initialize with the "Newest" tab
+        showTopics('newest');
+
+        // Update countdowns every minute
+        setInterval(updateAllCountdowns, 60000);
+
+        // Allow pressing Enter to send messages
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
